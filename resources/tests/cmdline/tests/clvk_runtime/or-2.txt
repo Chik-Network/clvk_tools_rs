@@ -1,0 +1,2 @@
+run -i clvk_runtime -i clvk_runtime '(mod (A B) (include "macros.clvk") (or (= 0 1) (= 2 4) (= 3 3)))'
+(q . 1)

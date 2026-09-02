@@ -1,0 +1,2 @@
+run -i clvk_runtime '(mod (A B) (include "macros.clvk") (and (= 1 1) (= 2 4) (= 3 3)))'
+()
