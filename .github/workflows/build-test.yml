@@ -232,7 +232,7 @@ jobs:
         docker run -v ${GITHUB_WORKSPACE}:/root/clvk_tools_rs -t clvk-tools-rs-alpine sh /root/build-alpine.sh
 
     - name: Upload artifacts
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: wheels-${{ matrix.os }}-py-${{ matrix.python }}
         path: ./target/wheels/
