@@ -200,7 +200,7 @@ dependencies = [
 name = "clvkr"
 version = "0.16.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f2912d50a0b9e3519e71a188472c63b98df6d302c9466c567862a473b2f10068"
+checksum = "f168951be75887338d2cf0fc4a9db84d983a48898964d9062b81afe420489b56"
 dependencies = [
  "bitvec",
  "bumpalo",
