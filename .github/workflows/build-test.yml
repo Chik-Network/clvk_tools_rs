@@ -161,7 +161,7 @@ jobs:
           python -m pip install maturin==1.7.0 && \
           cd .. && pip install --no-index --find-links target/wheels/ clvk_tools_rs && \
           cd chik_puzzles && \
-          pip install click typing_extensions chik_rs clvk chik_puzzles_py) && \
+          pip install click typing_extensions chik_rs clvk chik_puzzles_py clvk-rs ) && \
         pip uninstall -y clvk_tools_rs && \
         pip install --no-index --find-links target/wheels/ clvk_tools_rs && \
         (cd chik_puzzles && export PYTHONPATH=${PYTHONPATH}:$(pwd) && \
