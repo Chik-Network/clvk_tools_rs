@@ -1,4 +1,3 @@
-use chik_bls::PublicKey;
 use num_traits::{One, Zero};
 use std::clone::Clone;
 use std::cmp::Ordering;
@@ -6,6 +5,7 @@ use std::cmp::{max, min};
 use std::collections::HashMap;
 use std::fmt::{Debug, Display};
 
+use bls12_381::G1Affine;
 use sha2::Digest;
 use sha2::Sha256;
 
@@ -84,7 +84,7 @@ pub enum UnvalidatedBytesFromType {
 pub enum BytesFromType {
     Raw(Vec<u8>),
     String(String),
-    G1Element(PublicKey),
+    G1Element(G1Affine),
 }
 
 #[derive(Debug, Clone)]
@@ -117,7 +117,7 @@ impl Bytes {
                 Bytes::new(Some(BytesFromType::Raw(bvec)))
             }
             Some(BytesFromType::G1Element(g1)) => Bytes {
-                _b: g1.to_bytes().to_vec(),
+                _b: g1.to_uncompressed().to_vec(),
             },
         }
     }

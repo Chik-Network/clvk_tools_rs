@@ -4,7 +4,6 @@ use std::borrow::Borrow;
 use std::collections::HashMap;
 use std::rc::Rc;
 
-use clvk_rs::error::EvalErr;
 use clvkr::allocator::Allocator;
 
 use crate::classic::clvk_tools::binutils::assemble;
@@ -586,15 +585,8 @@ pub fn gather_dependencies(
 ) -> Result<Vec<IncludeDesc>, CompileErr> {
     let mut allocator = Allocator::new();
 
-    let assembled_input = assemble(&mut allocator, file_content).map_err(|e| {
-        CompileErr(
-            Srcloc::start(real_input_path),
-            match e {
-                EvalErr::InternalError(_, e) => e.to_string(),
-                _ => e.to_string(),
-            },
-        )
-    })?;
+    let assembled_input = assemble(&mut allocator, file_content)
+        .map_err(|e| CompileErr(Srcloc::start(real_input_path), e.1))?;
     let dialect = detect_modern(&mut allocator, assembled_input);
     opts = opts.set_stdenv(dialect.strict).set_dialect(dialect.clone());
     if let Some(stepping) = dialect.stepping {

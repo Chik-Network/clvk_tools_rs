@@ -7,7 +7,6 @@ pub mod depgraph;
 pub mod double_apply;
 pub mod strategy;
 
-use clvk_rs::error::EvalErr;
 #[cfg(test)]
 use num_bigint::ToBigInt;
 
@@ -681,15 +680,7 @@ pub fn run_optimizer(
         })?;
 
     let optimized = optimize_sexp(allocator, to_clvk_rs.1, runner)
-        .map_err(|e| {
-            CompileErr(
-                to_clvk_rs.0.clone(),
-                match e {
-                    EvalErr::InternalError(_, e) => e.to_string(),
-                    _ => e.to_string(),
-                },
-            )
-        })
+        .map_err(|e| CompileErr(to_clvk_rs.0.clone(), e.1))
         .map(|x| (to_clvk_rs.0, x))?;
 
     convert_from_clvk_rs(allocator, optimized.0, optimized.1).map_err(|e| match e {

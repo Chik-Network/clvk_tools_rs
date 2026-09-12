@@ -2,7 +2,7 @@ use std::collections::HashMap;
 use std::rc::Rc;
 
 use clvk_rs::allocator::{Allocator, NodePtr, SExp};
-use clvk_rs::error::EvalErr;
+use clvk_rs::reduction::EvalErr;
 
 use crate::classic::clvk::__type_compatibility__::{Bytes, BytesFromType, Stream};
 use crate::classic::clvk::serialize::sexp_to_stream;

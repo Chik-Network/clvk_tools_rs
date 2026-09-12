@@ -20,8 +20,7 @@ use crate::classic::clvk::as_rust::{TToSexpF, TValStack};
 use crate::classic::clvk::casts::int_from_bytes;
 use crate::classic::clvk::sexp::{to_sexp_type, CastableType};
 use clvk_rs::allocator::{Allocator, NodePtr, SExp};
-use clvk_rs::error::EvalErr;
-use clvk_rs::reduction::{Reduction, Response};
+use clvk_rs::reduction::{EvalErr, Reduction, Response};
 
 const MAX_SINGLE_BYTE: u32 = 0x7F;
 const CONS_BOX_MARKER: u32 = 0xFF;
@@ -186,10 +185,7 @@ impl OpStackEntry for OpReadSexp {
     ) -> Option<EvalErr> {
         let blob = f.read(1);
         if blob.length() == 0 {
-            return Some(EvalErr::InternalError(
-                NodePtr::NIL,
-                "bad encoding".to_string(),
-            ));
+            return Some(EvalErr(NodePtr::NIL, "bad encoding".to_string()));
         }
 
         let b = blob.at(0);
@@ -240,7 +236,7 @@ pub fn sexp_from_stream<'a>(
         return to_sexp_f.invoke(allocator, v);
     }
 
-    Err(EvalErr::InternalError(
+    Err(EvalErr(
         NodePtr::NIL,
         "No value left after conversion".to_string(),
     ))
@@ -273,26 +269,17 @@ pub fn atom_from_stream<'a>(
     if bit_count > 1 {
         let bin = f.read(bit_count - 1);
         if bin.length() != bit_count - 1 {
-            return Err(EvalErr::InternalError(
-                NodePtr::NIL,
-                "bad encoding".to_string(),
-            ));
+            return Err(EvalErr(NodePtr::NIL, "bad encoding".to_string()));
         }
         size_blob = size_blob.concat(&bin);
     }
     int_from_bytes(size_blob, None).and_then(|size| {
         if size >= 0x400000000 {
-            return Err(EvalErr::InternalError(
-                NodePtr::NIL,
-                "blob too large".to_string(),
-            ));
+            return Err(EvalErr(NodePtr::NIL, "blob too large".to_string()));
         }
         let blob = f.read(size as usize);
         if blob.length() != size as usize {
-            return Err(EvalErr::InternalError(
-                NodePtr::NIL,
-                "bad encoding".to_string(),
-            ));
+            return Err(EvalErr(NodePtr::NIL, "bad encoding".to_string()));
         }
         allocator.new_atom(blob.data())
     })

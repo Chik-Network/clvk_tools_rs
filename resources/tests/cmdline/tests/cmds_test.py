@@ -1,5 +1,6 @@
 import io
 import os
+import pkg_resources
 import shlex
 import sys
 import unittest

@@ -7,7 +7,6 @@ use std::rc::Rc;
 use clvk_rs::allocator;
 use clvk_rs::allocator::{Allocator, NodePtr};
 
-use clvk_rs::error::EvalErr;
 use num_bigint::ToBigInt;
 
 use sha2::Digest;
@@ -413,13 +412,7 @@ fn apply_op(
         .map_err(|e| {
             RunFailure::RunErr(
                 head.loc(),
-                format!(
-                    "{} in {application} {wrapped_args}",
-                    match e {
-                        EvalErr::InternalError(_, e) => e.to_string(),
-                        _ => e.to_string(),
-                    }
-                ),
+                format!("{} in {application} {wrapped_args}", e.1),
             )
         })
         .and_then(|v| convert_from_clvk_rs(allocator, head.loc(), v.1))

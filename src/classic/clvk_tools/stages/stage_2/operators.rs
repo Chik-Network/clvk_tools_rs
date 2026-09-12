@@ -8,8 +8,7 @@ use clvk_rs::allocator::{Allocator, NodePtr, SExp};
 use clvk_rs::chik_dialect::{ChikDialect, NO_UNKNOWN_OPS};
 use clvk_rs::cost::Cost;
 use clvk_rs::dialect::{Dialect, OperatorSet};
-use clvk_rs::error::EvalErr;
-use clvk_rs::reduction::{Reduction, Response};
+use clvk_rs::reduction::{EvalErr, Reduction, Response};
 use clvk_rs::run_program::run_program_with_pre_eval;
 
 use crate::classic::clvk::__type_compatibility__::{Bytes, BytesFromType, Stream};
@@ -81,7 +80,7 @@ pub fn full_path_for_filename(
                 .map(|x| x.to_owned())
                 .map(Ok)
                 .unwrap_or_else(|| {
-                    Err(EvalErr::InternalError(
+                    Err(EvalErr(
                         parent_sexp,
                         format!("could not compute absolute path for the combination of search path {path} and file name {filename} during text conversion from path_buf")
                     ))
@@ -89,10 +88,7 @@ pub fn full_path_for_filename(
         }
     }
 
-    Err(EvalErr::InternalError(
-        parent_sexp,
-        "can't open file".to_string(),
-    ))
+    Err(EvalErr(parent_sexp, "can't open file".to_string()))
 }
 
 pub struct CompilerOperators {
@@ -196,7 +192,7 @@ impl CompilerOperatorsInternal {
         // return EvalErr.
         let parse_file_content = |allocator: &mut Allocator, content: &String| {
             read_ir(content)
-                .map_err(|e| EvalErr::InternalError(NodePtr::NIL, e.to_string()))
+                .map_err(|e| EvalErr(NodePtr::NIL, e.to_string()))
                 .and_then(|ir| {
                     assemble_from_ir(allocator, Rc::new(ir)).map(|ir_sexp| Reduction(1, ir_sexp))
                 })
@@ -221,19 +217,13 @@ impl CompilerOperatorsInternal {
                     // the file.
                     fs::read_to_string(&filename)
                         .map_err(|_| {
-                            EvalErr::InternalError(
-                                NodePtr::NIL,
-                                format!("Failed to read file {filename}"),
-                            )
+                            EvalErr(NodePtr::NIL, format!("Failed to read file {filename}"))
                         })
                         .and_then(|content| parse_file_content(allocator, &content))
                 }
-                _ => Err(EvalErr::InternalError(
-                    NodePtr::NIL,
-                    "filename is not an atom".to_string(),
-                )),
+                _ => Err(EvalErr(NodePtr::NIL, "filename is not an atom".to_string())),
             },
-            _ => Err(EvalErr::InternalError(
+            _ => Err(EvalErr(
                 NodePtr::NIL,
                 "given a program that is an atom".to_string(),
             )),
@@ -257,20 +247,14 @@ impl CompilerOperatorsInternal {
                     write_ir_to_stream(Rc::new(ir), &mut stream);
                     return fs::write(filename_bytes.decode(), stream.get_value().decode())
                         .map_err(|_| {
-                            EvalErr::InternalError(
-                                sexp,
-                                format!("failed to write {}", filename_bytes.decode()),
-                            )
+                            EvalErr(sexp, format!("failed to write {}", filename_bytes.decode()))
                         })
                         .map(|_| Reduction(1, NodePtr::NIL));
                 }
             }
         }
 
-        Err(EvalErr::InternalError(
-            sexp,
-            "failed to write data".to_string(),
-        ))
+        Err(EvalErr(sexp, "failed to write data".to_string()))
     }
 
     fn get_compile_filename(&self, allocator: &mut Allocator) -> Response {
@@ -312,7 +296,7 @@ impl CompilerOperatorsInternal {
             }
         }
 
-        Err(EvalErr::InternalError(sexp, "can't open file".to_string()))
+        Err(EvalErr(sexp, "can't open file".to_string()))
     }
 
     fn get_source_file(&self, allocator: &mut Allocator) -> Result<Reduction, EvalErr> {

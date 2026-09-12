@@ -3,7 +3,7 @@ use crate::classic::clvk::sexp::{enlist, proper_list};
 use crate::compiler::gensym::gensym;
 use crate::util::Number;
 use clvk_rs::allocator::{Allocator, NodePtr, SExp};
-use clvk_rs::error::EvalErr;
+use clvk_rs::reduction::EvalErr;
 use num_bigint::ToBigInt;
 use std::collections::HashMap;
 

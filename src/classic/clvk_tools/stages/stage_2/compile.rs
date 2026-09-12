@@ -2,8 +2,7 @@ use std::collections::{HashMap, HashSet};
 use std::rc::Rc;
 
 use clvk_rs::allocator::{Allocator, NodePtr, SExp};
-use clvk_rs::error::EvalErr;
-use clvk_rs::reduction::{Reduction, Response};
+use clvk_rs::reduction::{EvalErr, Reduction, Response};
 
 use crate::classic::clvk::__type_compatibility__::{Bytes, BytesFromType};
 use crate::classic::clvk::sexp::{enlist, first, map_m, non_nil, proper_list, rest};
@@ -218,7 +217,7 @@ fn lower_quote_(allocator: &mut Allocator, prog: NodePtr) -> Result<NodePtr, Eva
             if quote_atom.as_ref() == b"quote" {
                 if qlist.len() != 2 {
                     // quoted list should be 2: "(quote arg)"
-                    return Err(EvalErr::InternalError(prog, format!("Compilation error while compiling [{}]. quote takes exactly one argument.", disassemble(allocator, prog, None))));
+                    return Err(EvalErr(prog, format!("Compilation error while compiling [{}]. quote takes exactly one argument.", disassemble(allocator, prog, None))));
                 }
 
                 // Note: quote should have exactly one arg, so the length of
@@ -505,7 +504,7 @@ fn compile_application(
 ) -> Result<NodePtr, EvalErr> {
     let mut compiled_args = vec![operator];
 
-    let error_result = Err(EvalErr::InternalError(
+    let error_result = Err(EvalErr(
         prog,
         format!(
             "can't compile {}, unknown operator",
@@ -770,7 +769,7 @@ pub fn do_com_prog_for_dialect(
             // x
             //})
         }
-        _ => Err(EvalErr::InternalError(
+        _ => Err(EvalErr(
             sexp,
             "Program is not a pair in do_com_prog".to_string(),
         )),
@@ -798,7 +797,7 @@ pub fn get_compile_filename(
         ));
     }
 
-    Err(EvalErr::InternalError(
+    Err(EvalErr(
         NodePtr::NIL,
         "Couldn't decode result filename".to_string(),
     ))

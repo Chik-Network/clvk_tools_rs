@@ -1,6 +1,6 @@
 [package]
 name = "clvk_tools_wasm"
-version = "0.4.0"
+version = "0.1.48"
 edition = "2018"
 authors = ["Art Yerkes <art.yerkes@gmail.com>"]
 description = "tools for working with chiklisp language; compiler, repl, python and wasm bindings"
@@ -20,6 +20,7 @@ path = "src/mod.rs"
 clvk_tools_rs = { path= "..", features = [] }
 clvkr = { version = "0.16.0", features = ["pre-eval"] }
 wasm-bindgen = "=0.2.100"
+wasm-bindgen-test = "=0.3.50"
 js-sys = "0.3.60"
 num-bigint = "0.4.0"
 num-traits = "0.2.15"

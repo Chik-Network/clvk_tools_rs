@@ -23,7 +23,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [macos-15-intel, ubuntu-latest, windows-latest]
+        os: [macos-13, ubuntu-latest, windows-latest]
         python: [3.9, '3.10', 3.11]
 
     steps:
@@ -63,7 +63,7 @@ jobs:
     - name: Build Linux in manylinux_2_28 with maturin on Python ${{ matrix.python }}
       if: startsWith(matrix.os, 'ubuntu')
       run: |
-        docker run --rm -v $(pwd):/io ghcr.io/pyo3/maturin:v1.8.3 build --release --strip --manylinux 2_28 --sdist
+        docker run --rm -v $(pwd):/io ghcr.io/pyo3/maturin:v1.7.0 build --release --strip --manylinux 2_28 --sdist
         # Refresh in case any ownerships changed.
         mv target target.docker && cp -r target.docker target
         # Ensure an empty .cargo-lock file exists.
@@ -161,14 +161,13 @@ jobs:
           python -m pip install maturin==1.7.0 && \
           cd .. && pip install --no-index --find-links target/wheels/ clvk_tools_rs && \
           cd chik_puzzles && \
-          pip install click typing_extensions chik_rs clvk chik_puzzles_py clvk-rs ) && \
-        pip uninstall -y clvk_tools_rs && \
-        pip install --no-index --find-links target/wheels/ clvk_tools_rs && \
-        (cd chik_puzzles && export PYTHONPATH=${PYTHONPATH}:$(pwd) && \
-        ./verify_compiler_version.sh ${CLVK_TOOLS_RS_VERSION} && . .venv/bin/activate && \
-        echo "Running check" && \
-        python chik_puzzles_py/manage_clvk.py check && \
-        echo "Check successful")
+          # deps for manage_clvk.py
+          pip install click typing_extensions chik_rs clvk chik_puzzles_py && \
+          export PYTHONPATH=${PYTHONPATH}:$(pwd) && \
+          ./verify_compiler_version.sh ${CLVK_TOOLS_RS_VERSION} && . .venv/bin/activate && \
+          echo "Running check" && \
+          python chik_puzzles_py/manage_clvk.py check && \
+          echo "Check successful")
 
     - name: Test Classic command line tools with pytest
       if: startsWith(matrix.os, 'ubuntu') && startsWith(matrix.python, '3.9')

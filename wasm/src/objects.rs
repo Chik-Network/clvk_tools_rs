@@ -19,7 +19,6 @@ use clvk_tools_rs::compiler::clvk::{convert_from_clvk_rs, convert_to_clvk_rs, sh
 use clvk_tools_rs::compiler::prims::{primapply, primcons, primquote};
 use clvk_tools_rs::compiler::sexp::SExp;
 use clvk_tools_rs::compiler::srcloc::Srcloc;
-use clvkr::error::EvalErr;
 use clvkr::Allocator;
 
 use crate::api::{create_clvk_runner_err, get_next_id};
@@ -648,11 +647,8 @@ impl Program {
         let run_result = runner
             .run_program(&mut allocator, prog_classic, arg_classic, None)
             .map_err(|e| {
-                let err_str = match e {
-                    EvalErr::InternalError(_, e) => e.to_string(),
-                    _ => e.to_string(),
-                };
-                let err: JsValue = JsString::from(err_str.as_str()).into();
+                let err_str: &str = &e.1;
+                let err: JsValue = JsString::from(err_str).into();
                 err
             })?;
         let modern_result = convert_from_clvk_rs(&mut allocator, get_srcloc(), run_result.1)

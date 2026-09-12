@@ -1,15 +1,17 @@
 use clvk_rs::allocator::{Allocator, NodePtr};
-use clvk_rs::chik_dialect::{ChikDialect, ENABLE_KECCAK_OPS_OUTSIDE_GUARD, NO_UNKNOWN_OPS};
+use clvk_rs::chik_dialect::{
+    ChikDialect, ENABLE_KECCAK, ENABLE_KECCAK_OPS_OUTSIDE_GUARD, NO_UNKNOWN_OPS,
+};
 use clvk_rs::core_ops::{op_cons, op_eq, op_first, op_if, op_listp, op_raise, op_rest};
 use clvk_rs::cost::Cost;
 use clvk_rs::dialect::{Dialect, OperatorSet};
-use clvk_rs::error::EvalErr;
+use clvk_rs::err_utils::err;
 use clvk_rs::more_ops::{
     op_add, op_all, op_any, op_ash, op_concat, op_div, op_divmod, op_gr, op_gr_bytes, op_logand,
     op_logior, op_lognot, op_logxor, op_lsh, op_multiply, op_not, op_point_add, op_pubkey_for_exp,
     op_sha256, op_strlen, op_substr, op_subtract, op_unknown,
 };
-use clvk_rs::reduction::{Reduction, Response};
+use clvk_rs::reduction::{EvalErr, Reduction, Response};
 
 use clvk_rs::run_program::{run_program_with_pre_eval, PreEval};
 
@@ -66,10 +68,7 @@ fn unknown_operator(
     max_cost: Cost,
 ) -> Response {
     if (flags & NO_UNKNOWN_OPS) != 0 {
-        Err(EvalErr::InternalError(
-            o,
-            "unimplemented operator".to_string(),
-        ))
+        err(o, "unimplemented operator")
     } else {
         op_unknown(allocator, o, args, max_cost)
     }
@@ -203,7 +202,7 @@ impl TRunProgram for DefaultProgramRunner {
             ),
             _ => run_program_with_pre_eval_dialect(
                 allocator,
-                &ChikDialect::new(NO_UNKNOWN_OPS | ENABLE_KECCAK_OPS_OUTSIDE_GUARD),
+                &ChikDialect::new(NO_UNKNOWN_OPS | ENABLE_KECCAK | ENABLE_KECCAK_OPS_OUTSIDE_GUARD),
                 program,
                 args,
                 max_cost,
